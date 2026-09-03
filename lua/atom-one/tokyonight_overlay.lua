@@ -58,7 +58,33 @@ function M.setup()
   --    script (loaded by the outer `:colorscheme atom-one-tokyonight`).
   --    Calling it recursively silently left Normal/etc. on Neovim's
   --    built-in "default" colorscheme instead of tokyonight's.
-  tokyonight.load({ style = "night" })
+  --
+  --    Diff contrast is bumped here, via `on_colors`, rather than by
+  --    overwriting DiffAdd/DiffChange/DiffDelete with nvim_set_hl after the
+  --    fact: tokyonight's own Neogit integration
+  --    (lua/tokyonight/groups/neogit.lua) reads c.diff.add/c.diff.delete
+  --    directly for NeogitDiffAddHighlight/NeogitDiffDeleteHighlight (the
+  --    highlight used for the hunk line the cursor is actually on), and
+  --    Neogit's own highlight setup (lua/neogit/lib/hl.lua) only fills in
+  --    a group `if not is_set(group)` - since tokyonight already set these,
+  --    Neogit never touches them again. Patching DiffAdd/DiffChange/
+  --    DiffDelete afterwards can never reach that: it's set from c.diff
+  --    before any highlight group exists. `on_colors` runs before
+  --    tokyonight builds any group (colors/init.lua calls it right after
+  --    computing colors.diff), so this is the one place a diff-contrast
+  --    override actually reaches every consumer of c.diff - base.lua's own
+  --    Diff* groups, Neogit's, and anything else - in one shot. Same
+  --    colors/alphas as the previous per-group patch: green2/red1/blue7
+  --    and bg are fields tokyonight's own `colors` table already carries.
+  tokyonight.load({
+    style = "night",
+    on_colors = function(colors)
+      local Util = require("atom-one.util")
+      colors.diff.add = Util.blend(colors.green2, 0.35, colors.bg)
+      colors.diff.delete = Util.blend(colors.red1, 0.42, colors.bg)
+      colors.diff.change = Util.blend(colors.blue7, 0.35, colors.bg)
+    end,
+  })
 
   -- 2. Overlay atom-one-darker's code-highlighting groups on top.
   local atom_colors = require("atom-one.colors.darker").setup()
@@ -71,18 +97,6 @@ function M.setup()
       vim.api.nvim_set_hl(0, group, hl)
     end
   end
-
-  -- 3. One narrow UI exception: tokyonight's own diff blends (0.25 for
-  --    add/delete, 0.15 for change) are all too subtle against this bg to
-  --    actually notice in real use - the same low-contrast problem already
-  --    fixed for the 5 official atom-one variants (see colors/darker.lua).
-  --    Bumped using the same alphas validated there. DiffText is left
-  --    alone - it's already a solid (non-blended) color plus bold.
-  local Util = require("atom-one.util")
-  local ty_colors = require("tokyonight.colors").setup({ style = "night" })
-  vim.api.nvim_set_hl(0, "DiffAdd", { bg = Util.blend(ty_colors.green2, 0.35, ty_colors.bg) })
-  vim.api.nvim_set_hl(0, "DiffDelete", { bg = Util.blend(ty_colors.red1, 0.42, ty_colors.bg) })
-  vim.api.nvim_set_hl(0, "DiffChange", { bg = Util.blend(ty_colors.blue7, 0.35, ty_colors.bg) })
 
   vim.g.colors_name = "atom-one-tokyonight"
 end
