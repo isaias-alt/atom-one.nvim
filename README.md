@@ -55,7 +55,9 @@ output rendered to SVG with the colorscheme's actual resolved
   theme's TextMate scopes - not a generic/approximate port.
 - LSP semantic token (`@lsp.type.*` / `@lsp.typemod.*`) support.
 - Terminal ANSI colors (`:terminal`, and anything that shells out).
-- No dependencies beyond Neovim itself.
+- No dependencies beyond Neovim itself, except the experimental
+  `atom-one-tokyonight-syntax` colorscheme (see below), which requires
+  [folke/tokyonight.nvim](https://github.com/folke/tokyonight.nvim).
 
 Out of scope for now: plugin-specific highlight groups (telescope,
 gitsigns, cmp, lualine, etc.). This plugin covers the baseline every
@@ -67,6 +69,9 @@ later, added one at a time as they're actually needed.
 - [Neovim](https://github.com/neovim/neovim) >=
   [0.9.0](https://github.com/neovim/neovim/releases/tag/v0.9.0) (for
   Treesitter highlighting and semantic tokens)
+- [folke/tokyonight.nvim](https://github.com/folke/tokyonight.nvim) - only
+  if you use the experimental `atom-one-tokyonight-syntax` colorscheme; not
+  needed for any of the 5 official variants
 
 ## Installation
 
@@ -94,6 +99,9 @@ colorscheme atom-one-darker
 colorscheme atom-one-flat
 colorscheme atom-one-mix
 colorscheme atom-one-night-flat
+
+" Experimental: tokyonight UI + atom-one syntax, see below.
+colorscheme atom-one-tokyonight-syntax
 ```
 
 ```lua
@@ -136,6 +144,28 @@ require("atom-one").setup({
 
 Calling `setup()` is only needed to change these; loading a
 `:colorscheme atom-one*` on its own works with the defaults.
+
+## Experimental: tokyonight UI, atom-one syntax
+
+`atom-one-tokyonight-syntax` is a different kind of colorscheme than the 5
+official variants above: instead of its own palette, it loads
+[tokyonight.nvim](https://github.com/folke/tokyonight.nvim)'s `night` style
+in full - every UI group and every plugin integration it ships (telescope,
+cmp, gitsigns, notify, ...) - and then overlays only the code-highlighting
+groups (the classic vim syntax groups plus every Treesitter/LSP-semantic-
+token `@` group) with atom-one-darker's colors. The result: tokyonight's
+look everywhere, atom-one's syntax highlighting in code.
+
+```vim
+colorscheme atom-one-tokyonight-syntax
+```
+
+Requires `folke/tokyonight.nvim` to be installed (it isn't a dependency of
+this plugin's 5 official variants, only this one). It also doesn't go
+through `atom-one.setup()` - `opts.transparent` and `opts.terminal_colors`
+don't apply to it; it inherits tokyonight's background and terminal ANSI
+colors as-is. See `lua/atom-one/tokyonight_overlay.lua` for the
+implementation.
 
 ## Overriding colors & highlight groups
 
