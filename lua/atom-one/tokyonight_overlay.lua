@@ -1,5 +1,5 @@
--- `atom-one-tokyonight-syntax`: tokyonight's theme in full, with only "how
--- the code looks" swapped for atom-one-darker's.
+-- `atom-one-tokyonight`: tokyonight's theme in full, with only "how the
+-- code looks" swapped for atom-one-darker's.
 --
 -- This is NOT another `colors/*.lua` palette variant selected via
 -- `opts.variant` - that pipeline (theme.lua -> groups.setup()) only knows
@@ -44,13 +44,21 @@ local function is_code_group(group)
 end
 
 function M.setup()
-  if not pcall(require, "tokyonight") then
-    error("atom-one-tokyonight-syntax requires folke/tokyonight.nvim to be installed")
+  local ok, tokyonight = pcall(require, "tokyonight")
+  if not ok then
+    error("atom-one-tokyonight requires folke/tokyonight.nvim to be installed")
   end
 
   -- 1. Full tokyonight - every UI/chrome/plugin-integration group it
-  --    defines, untouched.
-  vim.cmd.colorscheme("tokyonight-night")
+  --    defines, untouched. Calling `require("tokyonight").load(...)`
+  --    directly rather than `vim.cmd.colorscheme("tokyonight-night")`:
+  --    `:colorscheme` is documented as non-reentrant ("Doesn't work
+  --    recursively, thus you can't use ':colorscheme' in a color scheme
+  --    script" - :help :colorscheme) and this file IS a color scheme
+  --    script (loaded by the outer `:colorscheme atom-one-tokyonight`).
+  --    Calling it recursively silently left Normal/etc. on Neovim's
+  --    built-in "default" colorscheme instead of tokyonight's.
+  tokyonight.load({ style = "night" })
 
   -- 2. Overlay atom-one-darker's code-highlighting groups on top.
   local atom_colors = require("atom-one.colors.darker").setup()
@@ -64,7 +72,7 @@ function M.setup()
     end
   end
 
-  vim.g.colors_name = "atom-one-tokyonight-syntax"
+  vim.g.colors_name = "atom-one-tokyonight"
 end
 
 return M
