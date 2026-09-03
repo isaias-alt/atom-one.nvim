@@ -90,7 +90,15 @@ function M.get(c, opts)
     ["@keyword.return"]              = "Keyword",
     ["@keyword.exception"]           = "Exception",
     ["@keyword.debug"]               = "Debug",
-    ["@keyword.import"]              = { fg = c.blue }, -- keyword.operator.expression.import
+    -- nvim-treesitter's @keyword.import covers the plain
+    -- import/export/from/as/require statement keywords (see
+    -- queries/ecma+typescript/highlights.scm) - that's ground truth's bare
+    -- `keyword.control` scope (magenta), same bucket as every other
+    -- control keyword. `keyword.operator.expression.import` (blue) is a
+    -- narrower VS Code scope for the dynamic `import()` expression
+    -- operator specifically, which nvim-treesitter doesn't capture as a
+    -- distinct node - was wrongly treated as the same thing.
+    ["@keyword.import"]              = "Keyword",
     ["@keyword.export"]              = "@keyword.import",
     ["@keyword.directive"]           = "PreProc",
     ["@keyword.directive.define"]    = "Define",

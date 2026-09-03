@@ -140,7 +140,7 @@ function M.get(c, opts)
     Keyword                     = { fg = c.magenta, style = opts.styles.keywords }, -- tokenColors: bare `keyword`
     Exception                   = "Statement",
     PreProc                     = { fg = c.magenta },
-    Include                     = { fg = c.blue }, -- tokenColors: `keyword.operator.expression.import`
+    Include                     = "Keyword", -- tokenColors: bare `keyword.control` (plain import/#include/use) - see groups/treesitter.lua's @keyword.import comment
     Define                      = "PreProc",
     Macro                       = { fg = c.blue },
     PreCondit                   = "PreProc",
