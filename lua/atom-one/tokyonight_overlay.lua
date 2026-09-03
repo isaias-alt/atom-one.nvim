@@ -72,14 +72,16 @@ function M.setup()
     end
   end
 
-  -- 3. One narrow UI exception: tokyonight's own DiffChange is blended at
-  --    only 0.15 alpha (blend_bg(blue7, 0.15) in tokyonight/colors/init.lua)
-  --    - nearly invisible against this bg, the exact same low-contrast
-  --    problem already fixed for the 5 official atom-one variants (see
-  --    colors/darker.lua). DiffAdd/DiffDelete/DiffText are tokyonight's own
-  --    0.25/0.25 blends and read fine as-is - left untouched.
+  -- 3. One narrow UI exception: tokyonight's own diff blends (0.25 for
+  --    add/delete, 0.15 for change) are all too subtle against this bg to
+  --    actually notice in real use - the same low-contrast problem already
+  --    fixed for the 5 official atom-one variants (see colors/darker.lua).
+  --    Bumped using the same alphas validated there. DiffText is left
+  --    alone - it's already a solid (non-blended) color plus bold.
   local Util = require("atom-one.util")
   local ty_colors = require("tokyonight.colors").setup({ style = "night" })
+  vim.api.nvim_set_hl(0, "DiffAdd", { bg = Util.blend(ty_colors.green2, 0.35, ty_colors.bg) })
+  vim.api.nvim_set_hl(0, "DiffDelete", { bg = Util.blend(ty_colors.red1, 0.42, ty_colors.bg) })
   vim.api.nvim_set_hl(0, "DiffChange", { bg = Util.blend(ty_colors.blue7, 0.35, ty_colors.bg) })
 
   vim.g.colors_name = "atom-one-tokyonight"
