@@ -65,10 +65,15 @@ function M.setup()
       -- diffEditor.insertedTextBackground / inlineChatDiff.removed are the
       -- only add/remove backgrounds this theme defines; there's no distinct
       -- "changed line" color, so `change`/`text` fall back to warning/info.
-      add = Util.blend("#00809b", 0x33 / 0xff, bg),
-      delete = Util.blend("#9a353d", 0x33 / 0xff, bg),
-      change = Util.blend("#d19a66", 0.15, bg),
-      text = Util.blend("#61afef", 0.25, bg),
+      --
+      -- Alphas bumped past the VS Code ground-truth values (0x33/0.15/0.25):
+      -- at those values add/delete/change wash out against a dark bg and
+      -- read as barely-there gray, especially in diffview.nvim/neogit (which
+      -- render through these same DiffAdd/DiffDelete/DiffChange groups).
+      add = Util.blend("#00809b", 0.35, bg),
+      delete = Util.blend("#9a353d", 0.42, bg),
+      change = Util.blend("#d19a66", 0.28, bg),
+      text = Util.blend("#61afef", 0.32, bg),
     },
 
     -- terminal.ansi* - identical across all 5 variants

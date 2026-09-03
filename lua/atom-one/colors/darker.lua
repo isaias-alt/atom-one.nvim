@@ -55,10 +55,14 @@ function M.setup()
     hint = "#56b6c2",
 
     diff = {
-      add = Util.blend("#00809b", 0x33 / 0xff, bg),
-      delete = Util.blend("#9a353d", 0x33 / 0xff, bg),
-      change = Util.blend("#d19a66", 0.15, bg),
-      text = Util.blend("#61afef", 0.25, bg),
+      -- Bumped past the VS Code ground-truth alphas (0x33/0.15/0.25): at
+      -- those values add/delete/change wash out against a dark bg and read
+      -- as barely-there gray, especially in diffview.nvim/neogit (which
+      -- render through these same DiffAdd/DiffDelete/DiffChange groups).
+      add = Util.blend("#00809b", 0.35, bg),
+      delete = Util.blend("#9a353d", 0.42, bg),
+      change = Util.blend("#d19a66", 0.28, bg),
+      text = Util.blend("#61afef", 0.32, bg),
     },
 
     terminal = {
